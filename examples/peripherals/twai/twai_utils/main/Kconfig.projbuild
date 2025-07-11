@@ -1,0 +1,36 @@
+menu "TWAI Configuration"
+    depends on SOC_TWAI_SUPPORTED
+
+    orsource "$IDF_PATH/examples/common_components/env_caps/$IDF_TARGET/Kconfig.env_caps"
+
+    config EXAMPLE_TX_GPIO_NUM
+        int "TX GPIO number"
+        range ENV_GPIO_RANGE_MIN ENV_GPIO_OUT_RANGE_MAX
+        default 4
+        help
+            GPIO number for TWAI TX line.
+
+    config EXAMPLE_RX_GPIO_NUM
+        int "RX GPIO number"
+        range ENV_GPIO_RANGE_MIN ENV_GPIO_IN_RANGE_MAX
+        default 5
+        help
+            GPIO number for TWAI RX line.
+
+    config EXAMPLE_ENABLE_TWAI_FD
+        bool "Enable TWAI-FD Support"
+        depends on SOC_TWAI_SUPPORT_FD
+        default false
+        help
+            Enable TWAI-FD (Flexible Data-rate) support.
+            Allows up to 64 bytes of data per frame and dual bit rates.
+            Only available on chips that support TWAI-FD.
+
+    config EXAMPLE_TX_QUEUE_LEN
+        int "TX Queue Length"
+        range 1 100
+        default 10
+        help
+            Length of the transmission queue for TWAI messages.
+
+endmenu

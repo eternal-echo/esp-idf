@@ -14,8 +14,11 @@
 #include "cmd_twai.h"
 #include "esp_log.h"
 #include "esp_console.h"
+#include "cmd_twai_internal.h"
 
 static const char *TAG = "cmd_twai";
+
+twai_controller_ctx_t s_twai_controller_ctx[SOC_TWAI_CONTROLLER_NUM];
 
 /* =============================================================================
  * GLOBAL STATE DEFINITION
@@ -25,8 +28,19 @@ static const char *TAG = "cmd_twai";
  * COMMAND REGISTRATION
  * =============================================================================*/
 
+twai_controller_ctx_t* get_controller_by_id(int controller_id)
+{
+    if (controller_id < 0 || controller_id >= SOC_TWAI_CONTROLLER_NUM) {
+        ESP_LOGE(TAG, "Invalid controller ID: %d (valid range: 0-%d)",
+                 controller_id, SOC_TWAI_CONTROLLER_NUM - 1);
+        return NULL;
+    }
+    return &s_twai_controller_ctx[controller_id];
+}
+
 void register_twai_commands(void)
 {
+    register_twai_core_commands();
     ESP_LOGI(TAG, "TWAI commands registered successfully");
 }
 
