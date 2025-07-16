@@ -43,6 +43,16 @@ typedef struct {
 } twai_core_ctx_t;
 
 /**
+ * @brief Context structure for the TWAI send command
+ */
+typedef struct {
+    SemaphoreHandle_t tx_done_sem;     // Semaphore for TX completion signaling
+    atomic_bool is_tx_pending;         // Flag to indicate if TX is in progress
+    twai_frame_t tx_frame;
+    uint8_t tx_frame_buffer[TWAI_FRAME_BUFFER_SIZE];
+} twai_send_ctx_t;
+
+/**
  * @brief Core state machine for the TWAI console.
  *
  * This structure manages core driver resources, synchronization primitives,
@@ -55,6 +65,8 @@ typedef struct {
     twai_node_handle_t node_handle;
     /* Synchronization and Concurrency Control */
     SemaphoreHandle_t mutex;                     // Main protection mutex
+    /* Send Module Resources */
+    twai_send_ctx_t send_ctx;                   // Send context for this controller
 } twai_controller_ctx_t;
 
 extern twai_controller_ctx_t s_twai_controller_ctx[SOC_TWAI_CONTROLLER_NUM];
