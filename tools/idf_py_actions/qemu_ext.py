@@ -222,6 +222,14 @@ def action_extensions(base_actions: Dict, project_path: str) -> Dict:
         if not qemu_target_info:
             red_print(f'QEMU is not supported for target {target}')
             raise SystemExit(1)
+
+        # --- THIS IS YOUR MODIFICATION ---
+        # Forcing the script to use a custom QEMU binary by hardcoding the path.
+        # This is NOT a recommended practice. The proper way is to use the QEMU_BIN_PATH environment variable.
+        # This modification might be overwritten by future 'git pull' or 'idf_tools.py' updates.
+        qemu_target_info.qemu_prog = '/home/henry/Workspace/esp/qemu/build/qemu-system-xtensa'
+        # --- END OF MODIFICATION ---
+
         if not shutil.which(qemu_target_info.qemu_prog):
             red_print(f'{qemu_target_info.qemu_prog} is not installed. Please install it using '
                       f'"python $IDF_PATH/tools/idf_tools.py install {qemu_target_info.install_package}" '
@@ -319,6 +327,19 @@ def action_extensions(base_actions: Dict, project_path: str) -> Dict:
 
             if gdb and not options.wait_for_gdb:
                 yellow_print('Waiting for GDB to connect. You can now run "idf.py gdb" in another terminal window.')
+
+            if options.wait_for_monitor or options.wait_for_gdb:
+                # wait_for_socket(QEMU_PORT_SERIAL)
+                # --- MODIFICATION ---
+                # The original wait_for_socket function establishes a connection and immediately closes it.
+                # This might cause some QEMU versions to exit, assuming the session is over.
+                # We replace it with a simple, fixed delay to allow QEMU to initialize without being disturbed.
+                yellow_print('Waiting 2 seconds for custom QEMU to initialize...')
+                time.sleep(2)
+                # --- END OF MODIFICATION ---
+
+            if options.bg_mode:
+                yellow_print(f'QEMU is running in the background. To close it, run "idf.py qemu --stop" or "kill {qemu_proc.pid}"')
 
     qemu_actions = {
         'global_action_callbacks': [global_callback],
